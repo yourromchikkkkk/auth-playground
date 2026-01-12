@@ -2,6 +2,9 @@ from fastapi import FastAPI
 from modules.healthcheck.router import healthcheck_router
 from database.base import Base, engine
 
+# database models
+from modules import User
+
 app = FastAPI(
     title="Auth Playground",
     description="FastAPI auth playground",
