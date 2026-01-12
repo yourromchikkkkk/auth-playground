@@ -16,4 +16,4 @@ class User(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     def __repr__(self):
-        return f"<User(id={self.id}, email={self.email}, created_at={self.created_at})"
+        return f"<UserModel(id={self.id}, email={self.email}, created_at={self.created_at})"
