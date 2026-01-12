@@ -1,10 +1,10 @@
 from .db_models import User as UserModel
 
 class User:
-    def __init__(self, id: str, email: str, hashed_pass: str, email_verified: bool = False):
+    def __init__(self, id: str, email: str, hashed_password: str, email_verified: bool = False):
         self.id = id
         self.email = email
-        self.hashed_pass = hashed_pass
+        self.hashed_password = hashed_password
         self.email_verified = email_verified
 
     @classmethod
@@ -13,7 +13,7 @@ class User:
         return cls(
             id=db_user.id,
             email=db_user.email,
-            hashed_pass=db_user.hashed_pass,
+            hashed_password=db_user.hashed_password,
             email_verified=db_user.email_verified
         )
     

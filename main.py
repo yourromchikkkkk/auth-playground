@@ -1,6 +1,9 @@
 from fastapi import FastAPI
-from modules.healthcheck.router import healthcheck_router
 from database.base import Base, engine
+
+# routers
+from modules.healthcheck.router import healthcheck_router
+from modules.user.router import user_router
 
 # database models
 from modules import User
@@ -21,6 +24,7 @@ async def startup_event():
         raise e
 
 app.include_router(healthcheck_router, tags=["healthcheck"])
+app.include_router(user_router, tags=["users"])
 
 @app.get("/")
 async def root():
