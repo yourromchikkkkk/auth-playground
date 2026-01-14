@@ -43,3 +43,6 @@ Thumbs.db
 
 # Data
 data/**/*
+
+# Keys
+keys/**/*
