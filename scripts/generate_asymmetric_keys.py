@@ -1,6 +1,8 @@
-from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.primitives import serialization
 import os
+
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+
 
 # TODO: think of a better way to store the keys
 def generate_asymmetric_keys(path: str = "keys") -> None:
@@ -13,13 +15,13 @@ def generate_asymmetric_keys(path: str = "keys") -> None:
     private_pem = private_key.private_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PrivateFormat.PKCS8,
-        encryption_algorithm=serialization.NoEncryption()
+        encryption_algorithm=serialization.NoEncryption(),
     )
 
     public_key = private_key.public_key()
     public_pem = public_key.public_bytes(
-    encoding=serialization.Encoding.PEM,
-    format=serialization.PublicFormat.SubjectPublicKeyInfo
+        encoding=serialization.Encoding.PEM,
+        format=serialization.PublicFormat.SubjectPublicKeyInfo,
     )
 
     with open(f"{path}/public.pem", "wb") as file:
