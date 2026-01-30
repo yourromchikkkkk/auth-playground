@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy.orm import Session
 
-from database.base import get_db
-from utils import ResponseSchema
+from app.database.base import get_db
+from app.utils import ResponseSchema
 
 from .controller import UserController
 from .schemas import UserCreate, UserResponse, UserSignIn, UserSignInResponse

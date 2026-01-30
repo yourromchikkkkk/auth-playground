@@ -4,8 +4,8 @@ Healthcheck module router
 
 from fastapi import APIRouter
 
-from modules.healthcheck.controller import HealthCheckController
-from modules.healthcheck.schemas import HealthCheckResponse
+from app.modules.healthcheck.controller import HealthCheckController
+from app.modules.healthcheck.schemas import HealthCheckResponse
 
 healthcheck_router = APIRouter(prefix="/healthcheck")
 

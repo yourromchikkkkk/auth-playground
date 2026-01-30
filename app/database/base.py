@@ -19,7 +19,7 @@ def _init_db():
     """Initialize database engine and session (called lazily to avoid circular imports)"""
     global _engine, _SessionLocal
     if _engine is None:
-        from modules.core import settings
+        from app.modules.core import settings
 
         # Create engine
         database_url = str(settings.DATABASE_URL)

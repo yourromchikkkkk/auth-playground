@@ -1,15 +1,15 @@
 from fastapi import FastAPI
-from database.base import Base, engine
-from scripts import generate_asymmetric_keys
+from app.database.base import Base, engine
+from app.scripts import generate_asymmetric_keys
 import os
-from modules.core import settings
+from app.modules.core import settings
 
 # routers
-from modules.healthcheck.router import healthcheck_router
-from modules.user.router import user_router
+from app.modules.healthcheck.router import healthcheck_router
+from app.modules.user.router import user_router
 
 # database models
-from modules import User
+from app.modules import User
 
 app = FastAPI(
     title=f"Auth Playground v.{settings.SERVICE_VERSION}",
@@ -41,4 +41,3 @@ app.include_router(user_router, tags=["users"])
 @app.get("/")
 async def root():
     return {"message": f"Welcome to Auth Playground v.{settings.SERVICE_VERSION} API"}
-

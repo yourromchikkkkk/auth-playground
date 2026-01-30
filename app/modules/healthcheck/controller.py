@@ -4,8 +4,8 @@ Healthcheck module controller
 
 from datetime import datetime
 
-from modules.healthcheck.models import HealthStatus
-from modules.healthcheck.schemas import HealthCheckResponse
+from app.modules.healthcheck.models import HealthStatus
+from app.modules.healthcheck.schemas import HealthCheckResponse
 
 
 class HealthCheckController:

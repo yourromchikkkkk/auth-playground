@@ -6,20 +6,20 @@ A FastAPI project with modular architecture where each module contains its own m
 
 ```
 auth-playground/
-├── main.py                 # FastAPI application entry point
-├── requirements.txt        # Python dependencies
-├── database/              # Database configuration
-│   ├── __init__.py
-│   └── base.py           # Database base, engine, session
-├── modules/               # Application modules
-│   ├── __init__.py
-│   └── healthcheck/       # Healthcheck module
-│       ├── __init__.py
-│       ├── models.py      # Domain models (business logic)
-│       ├── db_models.py   # Database/ORM models (SQLAlchemy)
-│       ├── schemas.py     # Pydantic validation schemas
-│       ├── controller.py  # Business logic
-│       └── router.py      # API routes
+├── app/                    # Application code
+│   ├── main.py             # FastAPI application entry point
+│   ├── database/           # Database configuration
+│   │   ├── __init__.py
+│   │   └── base.py         # Database base, engine, session
+│   ├── modules/            # Application modules
+│   │   ├── core/           # Config, security
+│   │   ├── healthcheck/
+│   │   └── user/
+│   ├── utils/              # Shared utilities
+│   └── scripts/            # Scripts (e.g. key generation)
+├── data/                   # Database files (at root, not in app)
+├── keys/                   # RSA keys (at root, not in app)
+├── requirements.txt
 └── README.md
 ```
 
@@ -37,21 +37,21 @@ Each module follows a clean architecture pattern with:
 
 The project uses a hybrid database approach:
 
-- **`database/`**: Central database configuration
+- **`app/database/`**: Central database configuration
   - `base.py`: Database engine, session factory, and base model class
-  - All modules import from here: `from database.base import Base, get_db`
+  - All modules import from here: `from app.database.base import Base, get_db`
 
-- **`modules/{module_name}/db_models.py`**: Module-specific database models
+- **`app/modules/{module_name}/db_models.py`**: Module-specific database models
   - Each module defines its own SQLAlchemy models
-  - All models inherit from `database.base.Base`
+  - All models inherit from `app.database.base.Base`
   - Keeps database models scoped to their respective modules
 
 ### Example Database Model Structure
 
 ```python
-# modules/users/db_models.py
+# app/modules/user/db_models.py
 from sqlalchemy import Column, Integer, String
-from database.base import Base
+from app.database.base import Base
 
 class User(Base):
     __tablename__ = "users"
@@ -66,7 +66,7 @@ class User(Base):
 ```python
 from fastapi import Depends
 from sqlalchemy.orm import Session
-from database.base import get_db
+from app.database.base import get_db
 
 @router.get("/items")
 def get_items(db: Session = Depends(get_db)):
@@ -87,10 +87,11 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-3. Run the application:
+3. Run the application (from project root; `data/` and `keys/` stay at root):
 ```bash
-uvicorn main:app --reload
+uvicorn app.main:app --reload
 ```
+Or: `python -m app.main`
 
 The API will be available at `http://localhost:8000`
 
@@ -107,7 +108,7 @@ The API will be available at `http://localhost:8000`
 
 To add a new module:
 
-1. Create a new directory under `modules/` (e.g., `modules/users/`)
+1. Create a new directory under `app/modules/` (e.g., `app/modules/users/`)
 2. Create the following files:
    - `__init__.py`
    - `models.py` - Domain models (business logic)
@@ -115,19 +116,19 @@ To add a new module:
    - `schemas.py` - Pydantic validation schemas
    - `controller.py` - Business logic
    - `router.py` - API routes
-3. Register the router in `main.py`:
+3. Register the router in `app/main.py`:
 ```python
-from modules.users.router import users_router
+from app.modules.users.router import users_router
 app.include_router(users_router, tags=["users"])
 ```
 
 ### Database Setup
 
-1. Update `database/base.py` with your database connection string
+1. Update `app/modules/core/config.py` (e.g. `DATABASE_URL`) or use `.env`
 2. Create database tables (using Alembic migrations recommended):
 ```python
-from database.base import Base, engine
-from modules.users.db_models import User  # Import all models
+from app.database.base import Base, engine
+from app.modules.user.db_models import User  # Import all models
 # ... import other module models
 
 Base.metadata.create_all(bind=engine)

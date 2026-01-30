@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
-from modules.core import (
+from app.modules.core import (
     create_access_token,
     create_refresh_token,
     get_password_hash,
     settings,
     verify_password,
 )
-from utils import ResponseSchema
+from app.utils import ResponseSchema
 
 from .db_models import User as UserModel
 from .schemas import UserCreate, UserResponse, UserSignIn, UserSignInResponse

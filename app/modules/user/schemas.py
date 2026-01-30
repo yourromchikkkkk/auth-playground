@@ -32,7 +32,7 @@ class UserResponse(BaseModel):
 
 
 class UserSignInResponse(BaseModel):
-    """Sign in user response schema"""
+    """User sign in response schema"""
 
     user: UserResponse
     access_token: str

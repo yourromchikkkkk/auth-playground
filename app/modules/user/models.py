@@ -29,4 +29,4 @@ class User:
         return self.email_verified
 
     def __repr__(self):
-        return f"<User(id={self.id}, email={self.email}, email_verified={self.email_verified})"
+        return f"<User(id={self.id}, email={self.email}, email_verified={self.email_verified})>"
