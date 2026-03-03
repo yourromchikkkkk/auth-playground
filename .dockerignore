@@ -1,0 +1,14 @@
+# Data and keys stay on host / mounted at runtime
+data/
+keys/
+# Git and env
+.git
+.gitignore
+.env
+.env.local
+# IDE and OS
+.venv
+venv
+__pycache__
+*.pyc
+.DS_Store
