@@ -14,6 +14,9 @@ from app.utils import ResponseSchema
 from .db_models import User as UserModel
 from .schemas import UserCreate, UserResponse, UserSignIn, UserSignInResponse
 
+from ..role.db_models import Role as RoleModel
+from ..role.models import AvailableRoles
+
 
 class UserController:
     """Controller for user operations"""
@@ -27,8 +30,12 @@ class UserController:
         return refresh_token
 
     @staticmethod
+    def create_admin_user():
+        pass
+    
+    @staticmethod
     def create_user(
-        db: Session, user_data: UserCreate
+        db: Session, user_data: UserCreate, role = AvailableRoles.SUPPORT
     ) -> ResponseSchema[UserResponse] | ResponseSchema[None]:
         """Create a new user"""
         try:
@@ -43,8 +50,16 @@ class UserController:
                     error="User already exists",
                 )
 
+            role_record = db.query(RoleModel).filter(RoleModel.role == role.value).first()
+            if not role_record:
+                print(f"Role not found: {role}")
+                return ResponseSchema[None](
+                    status=400,
+                    message="Role not found",
+                    error="Role not found",
+                )
             hashed_password = get_password_hash(user_data.password)
-            new_user = UserModel(email=user_data.email, hashed_password=hashed_password)
+            new_user = UserModel(email=user_data.email, hashed_password=hashed_password, role_id=role_record.id)
             db.add(new_user)
             db.commit()
             db.refresh(new_user)
