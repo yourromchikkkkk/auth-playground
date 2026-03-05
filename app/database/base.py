@@ -6,6 +6,7 @@ import os
 from typing import Generator
 
 from sqlalchemy import create_engine
+from sqlalchemy import event
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -32,20 +33,34 @@ def _init_db():
             if db_dir and not os.path.exists(db_dir):
                 os.makedirs(db_dir, exist_ok=True)
 
-        _engine = create_engine(
-            database_url,
-            connect_args={"check_same_thread": False}
-            if "sqlite" in database_url
-            else {},
-        )
+            connect_args = {"check_same_thread": False, "timeout": 30}
+        else:
+            connect_args = {}
+
+        _engine = create_engine(database_url, connect_args=connect_args)
+
+        if "sqlite" in database_url:
+
+            @event.listens_for(_engine, "connect")
+            def set_sqlite_pragma(dbapi_conn, connection_record):
+                cursor = dbapi_conn.cursor()
+                cursor.execute("PRAGMA journal_mode=WAL")
+                cursor.execute("PRAGMA busy_timeout=30000")
+                cursor.close()
+
         _SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=_engine)
     return _engine, _SessionLocal
 
 
-def get_db() -> Generator[Session, None, None]:
-    """Get database session"""
+def get_session() -> Session:
+    """Get a new database session (for startup/scripts). Caller must close it."""
     _, SessionLocal = _init_db()
-    db = SessionLocal()
+    return SessionLocal()
+
+
+def get_db() -> Generator[Session, None, None]:
+    """Get database session (generator for FastAPI Depends)"""
+    db = get_session()
     try:
         yield db
     finally:
