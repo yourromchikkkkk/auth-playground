@@ -23,6 +23,14 @@ class Settings(BaseSettings):
         ..., description="Database URL", example="sqlite:///./data/app.db"
     )
 
+    # Superuser credentials
+    SUPER_USER_EMAIL: str = Field(
+        ..., description="Superuser login", example="testuser@gmail.com"
+    )
+    SUPER_USER_PASS: str = Field(
+        ..., description="Superuser password", example="Testpassword@qw"
+    )
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
