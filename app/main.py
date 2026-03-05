@@ -1,6 +1,7 @@
 from fastapi import FastAPI
-from app.database.base import Base, engine, get_db
-from app.scripts import generate_asymmetric_keys, populate_user_into_db
+
+from app.database.base import Base, _init_db, get_session
+from app.scripts import generate_asymmetric_keys, populate_user_into_db, create_super_admin_user
 import os
 from app.modules.core import settings
 
@@ -19,22 +20,23 @@ app = FastAPI(
 
 @app.on_event("startup")
 async def startup_event():
-    """Create all tables in the DB"""
+    """Create tables and seed initial data"""
+    db_engine, _ = _init_db()
     try:
-        Base.metadata.create_all(bind=engine)
+        Base.metadata.create_all(bind=db_engine)
     except Exception as e:
         print(f"Error creating tables: {e}")
         raise e
 
-    db_gen = get_db()
-    db = next(db_gen)
+    db = get_session()
     try:
         populate_user_into_db(db)
+        create_super_admin_user(db)
+    except Exception as e:
+        db.rollback()
+        raise e
     finally:
-        try:
-            next(db_gen)
-        except StopIteration:
-            pass
+        db.close()
     
     # Generate asymmetric keys
     if not os.path.exists(f"{settings.KEYS_PATH}/public.pem") or not os.path.exists(f"{settings.KEYS_PATH}/private.pem"):

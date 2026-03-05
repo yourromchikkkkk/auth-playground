@@ -30,10 +30,6 @@ class UserController:
         return refresh_token
 
     @staticmethod
-    def create_admin_user():
-        pass
-    
-    @staticmethod
     def create_user(
         db: Session, user_data: UserCreate, role = AvailableRoles.SUPPORT
     ) -> ResponseSchema[UserResponse] | ResponseSchema[None]:
@@ -62,12 +58,14 @@ class UserController:
             new_user = UserModel(email=user_data.email, hashed_password=hashed_password, role_id=role_record.id)
             db.add(new_user)
             db.commit()
+            print(f"New user created: {new_user}")
             db.refresh(new_user)
             user_response = UserResponse.model_validate(new_user)
             return ResponseSchema[UserResponse](
                 status=201, message="User created successfully", docs=[user_response]
             )
         except Exception as e:
+            print(f"Error creating user: {e}")
             return ResponseSchema[None](
                 status=500, message="Error creating user", error=str(e)
             )
